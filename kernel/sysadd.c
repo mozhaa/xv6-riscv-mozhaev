@@ -19,5 +19,5 @@ uint64 sys_add(void) {
     int ret = copyout(myproc()->pagetable, dst, (char*)&res, sizeof(int));
     if (ret < 0) return -3;
 
-    return 0;                      // Success
+    return 0;
 }
