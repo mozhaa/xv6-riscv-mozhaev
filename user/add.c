@@ -10,20 +10,24 @@ int add_from_buf(char* buf) {
     while (buf[i] <= '9' && buf[i] >= '0') {
         ++i;
         if (i == BUF_SIZE) {
+            printf("Buffer overflow!");
             exit(1); // Buffer overflow
         }
     }
     if (i == 0) {
+        printf("Invalid format!\n");
         exit(3); // Not a number in the beginning
     }
     int prev_i = i;
     while (!(buf[i] <= '9' && buf[i] >= '0')) {
         ++i;
         if (i == BUF_SIZE) {
+            printf("Buffer overflow!");
             exit(1); // Buffer overflow
         }
     }
     if (i == prev_i) {
+        printf("Invalid format!\n");
         exit(4); // No second number
     }
     int y = atoi(buf + i);
@@ -35,9 +39,11 @@ void add_b() {
     char buf[BUF_SIZE];
     char* ret = gets(buf, sizeof(buf));
     if (ret - buf > BUF_SIZE) {
+        printf("Buffer overflow!");
         exit(1); // Buffer overflow
     }
     if (ret == 0) {
+        printf("Input error!\n");
         exit(2); // Input error
     }
     printf("%d\n", add_from_buf(buf));
@@ -52,6 +58,7 @@ void add_c() {
             buf[m] = '\0';
             break; 
         } else if (m == BUF_SIZE - 1) {
+            printf("Buffer overflow!");
             exit(1); // Buffer overflow
         }
         ++m;
@@ -64,9 +71,11 @@ void add_sys_call_test() {
     char buf[BUF_SIZE];
     char* ret = gets(buf, sizeof(buf));
     if (ret - buf > BUF_SIZE) {
+        printf("Buffer overflow!");
         exit(1); // Buffer overflow
     }
     if (ret == 0) {
+        printf("Input error!\n");
         exit(2); // Input error
     }
     int x = atoi(buf);
@@ -74,20 +83,24 @@ void add_sys_call_test() {
     while (buf[i] <= '9' && buf[i] >= '0') {
         ++i;
         if (i == BUF_SIZE) {
+            printf("Buffer overflow!");
             exit(1); // Buffer overflow
         }
     }
     if (i == 0) {
+        printf("Invalid format!\n");
         exit(3); // Not a number in the beginning
     }
     int prev_i = i;
     while (!(buf[i] <= '9' && buf[i] >= '0')) {
         ++i;
         if (i == BUF_SIZE) {
+            printf("Buffer overflow!");
             exit(1); // Buffer overflow
         }
     }
     if (i == prev_i) {
+        printf("Invalid format!\n");
         exit(4); // No second number
     }
     int y = atoi(buf + i);
