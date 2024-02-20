@@ -28,7 +28,7 @@ int add_from_buf(char* buf) {
     }
     if (i == prev_i) {
         printf("Invalid format!\n");
-        exit(4); // No second number
+        exit(3); // No second number
     }
     int y = atoi(buf + i);
     return x + y;
@@ -101,7 +101,7 @@ void add_sys_call_test() {
     }
     if (i == prev_i) {
         printf("Invalid format!\n");
-        exit(4); // No second number
+        exit(3); // No second number
     }
     int y = atoi(buf + i);
     int s;
