@@ -41,10 +41,15 @@ int main(int argc, char** argv) {
     *(pbuf++) = '\n';
     *(pbuf++) = '\0';
     
-    write(fd[1], buf, sizeof(buf));
-    close(fd[1]); // close output side of pipe
-
-    int status;
-    wait(&status);
-    exit(0);
+    int ret = write(fd[1], buf, sizeof(buf));
+    if (ret > 0) { // write success
+        close(fd[1]);
+        int status;
+        wait(&status);
+        exit(0);
+    } else { // write error
+        fprintf(2, "Error occured during write()\n");
+        close(fd[1]);
+        exit(3);
+    }
 }
