@@ -22,7 +22,8 @@ int main(int argc, char** argv) {
         char *wcargv[] = {"wc", 0};
         
         exec("/wc", wcargv);
-        printf("exec error\n");
+        fprintf(2, "Error occured during exec()\n");
+        exit(7);
     }
     if (pid < 0) {
         // fork error
