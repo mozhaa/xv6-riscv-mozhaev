@@ -14,20 +14,19 @@ int main(int argc, char** argv) {
     if (pid == 0) {
         // child
 
-        char buf[100];
-        int ret = read(fd[0], buf, sizeof(buf));
-        if (ret > 0) { // read success
-            printf("%s", buf);
-            close(fd[0]);
-            exit(0);
-        } else if (ret == 0) { // eof
-            close(fd[0]);
-            exit(1);
-        } else { // read error
+        close(fd[1]);
+        char buf[128];
+        int len;
+        while ((len = read(fd[0], buf, sizeof(buf))) > 0) {
+            write(1, buf, len);
+        }
+        if (len < 0) {
             fprintf(2, "Error occured during read()\n");
             close(fd[0]);
             exit(2);
         }
+        close(fd[0]);
+        exit(0);
     }
     if (pid < 0) {
         // fork error
@@ -36,6 +35,7 @@ int main(int argc, char** argv) {
     }
     
     // parent
+    close(fd[0]);
     for (int i = 1; i < argc; i++) {
         int ret1 = write(fd[1], argv[i], strlen(argv[i]));
         int ret2 = write(fd[1], "\n", 1);

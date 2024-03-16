@@ -32,6 +32,7 @@ int main(int argc, char** argv) {
     }
     
     // parent
+    close(fd[0]);
     for (int i = 1; i < argc; i++) {
         int ret1 = write(fd[1], argv[i], strlen(argv[i]));
         int ret2 = write(fd[1], "\n", 1);
