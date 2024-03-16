@@ -32,25 +32,17 @@ int main(int argc, char** argv) {
     }
     
     // parent
-    char buf[100];
-    char* pbuf = buf;
-    for (int i = 1; i < argc; ++i) {
-        strcpy(pbuf, argv[i]);
-        pbuf += strlen(argv[i]);
-        *(pbuf++) = ' ';
-    }
-    *(pbuf++) = '\n';
-    *(pbuf++) = '\0';
-    
-    int ret = write(fd[1], buf, sizeof(buf));
-    if (ret > 0) { // write success
-        close(fd[1]);
-        int status;
-        wait(&status);
-        exit(0);
-    } else { // write error
-        fprintf(2, "Error occured during write()\n");
-        close(fd[1]);
-        exit(3);
-    }
+    for (int i = 1; i < argc; i++) {
+        int ret1 = write(fd[1], argv[i], strlen(argv[i]));
+        int ret2 = write(fd[1], "\n", 1);
+        if (ret1 < 0 || ret2 < 0) {
+            fprintf(2, "Error occured during write()\n");
+            close(fd[1]);
+            exit(3);
+        }
+    } 
+    close(fd[1]);
+    int status;
+    wait(&status);
+    exit(0);
 }
