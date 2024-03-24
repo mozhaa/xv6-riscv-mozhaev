@@ -54,6 +54,7 @@ int mutex_destroy(int md) {
             return 0;
         }
     }
+    release(&mtable_sp);
     return -2; // mutex is not held by current proc
 }
 
