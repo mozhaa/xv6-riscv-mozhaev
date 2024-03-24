@@ -185,5 +185,12 @@ void            virtio_disk_init(void);
 void            virtio_disk_rw(struct buf *, int);
 void            virtio_disk_intr(void);
 
+// sysmutex.c
+void            mtable_init(void);
+int             mutex_lock(int md);
+int             mutex_unlock(int md);
+int             mutex_create(void);
+int             mutex_destroy(int md);
+
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

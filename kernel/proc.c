@@ -5,6 +5,7 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
+#include "mutex.h"
 
 struct cpu cpus[NCPU];
 
@@ -55,6 +56,9 @@ procinit(void)
       initlock(&p->lock, "proc");
       p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
+      for (int i = 0; i < NOMUTEX; ++i) {
+        p->omutex[i] = 0;
+      }
   }
 }
 
@@ -320,6 +324,16 @@ fork(void)
 
   acquire(&np->lock);
   np->state = RUNNABLE;
+
+  // Increment proc_count of every used mutex.
+  for (i = 0; i < NOMUTEX; ++i) {
+    if (np->omutex[i] != 0) {
+      acquiresleep(np->omutex[i]->sl);
+      ++np->omutex[i]->proc_count;
+      releasesleep(np->omutex[i]->sl);
+    }
+  }
+
   release(&np->lock);
 
   return pid;
@@ -379,6 +393,15 @@ exit(int status)
   p->state = ZOMBIE;
 
   release(&wait_lock);
+
+  // Decrement proc_count of every used mutex.
+  for (int i = 0; i < NOMUTEX; ++i) {
+    if (p->omutex[i] != 0) {
+      acquiresleep(p->omutex[i]->sl);
+      --p->omutex[i]->proc_count;
+      releasesleep(p->omutex[i]->sl);
+    }
+  }
 
   // Jump into the scheduler, never to return.
   sched();

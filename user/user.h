@@ -22,6 +22,10 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int mutex_lock(int md);
+int mutex_unlock(int md);
+int mutex_create(void);
+int mutex_destroy(int md);
 
 // ulib.c
 int stat(const char*, struct stat*);
