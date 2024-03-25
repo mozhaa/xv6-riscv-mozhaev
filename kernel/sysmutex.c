@@ -11,6 +11,7 @@ struct mutex mtable[NMUTEX];
 struct spinlock mtable_sp;
 
 void mtable_init(void) {
+    initlock(&mtable_sp, "");
     acquire(&mtable_sp);
     for (int i = 0; i < NMUTEX; ++i) {
         initsleeplock(&mtable[i].sl, "");
