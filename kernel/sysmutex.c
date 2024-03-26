@@ -41,6 +41,9 @@ int mutex_create(void) {
 }
 
 int mutex_destroy(int md) {
+    if (md < 0 || md >= NMUTEX) {
+        return -3; // mutex descriptor out of bounds
+    }
     acquire(&mtable_sp);
     struct proc* p = myproc();
     if (!mtable[md].proc_count) {
@@ -60,6 +63,9 @@ int mutex_destroy(int md) {
 }
 
 int mutex_lock(int md) {
+    if (md < 0 || md >= NMUTEX) {
+        return -3; // mutex descriptor out of bounds
+    }
     if (!mtable[md].proc_count) {
         return -1; // unexisting mutex
     }
@@ -71,6 +77,9 @@ int mutex_lock(int md) {
 }
 
 int mutex_unlock(int md) {
+    if (md < 0 || md >= NMUTEX) {
+        return -3; // mutex descriptor out of bounds
+    }
     if (!mtable[md].proc_count) {
         return -1; // unexisting mutex
     }
