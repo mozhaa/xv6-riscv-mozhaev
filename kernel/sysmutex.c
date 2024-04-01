@@ -30,7 +30,7 @@ int mutex_create(void) {
             for (int j = 0; j < NOMUTEX; ++j) {
                 if (p->omutex[j] == 0) {
                     p->omutex[j] = &mtable[i];
-                    return i;
+                    return j;
                 }
             }
             return -2; // exceeded limit of open mutexes per process
@@ -41,52 +41,47 @@ int mutex_create(void) {
 }
 
 int mutex_destroy(int md) {
-    if (md < 0 || md >= NMUTEX) {
+    if (md < 0 || md >= NOMUTEX) {
         return -3; // mutex descriptor out of bounds
     }
-    acquire(&mtable_sp);
     struct proc* p = myproc();
-    if (!mtable[md].proc_count) {
-        release(&mtable_sp);
-        return -1; // unexisting mutex
+    if (p->omutex[md] == 0) {
+        return -2; // unexisting mutex
     }
-    for (int i = 0; i < NOMUTEX; ++i) {
-        if (p->omutex[i] == &mtable[md]) {
-            --mtable[md].proc_count;
-            release(&mtable_sp);
-            p->omutex[i] = 0;
-            return 0;
-        }
-    }
+    acquire(&mtable_sp);
+    --p->omutex[md]->proc_count;
     release(&mtable_sp);
-    return -2; // mutex is not held by current proc
+    p->omutex[md] = 0;
+    return 0;
 }
 
 int mutex_lock(int md) {
-    if (md < 0 || md >= NMUTEX) {
+    if (md < 0 || md >= NOMUTEX) {
         return -3; // mutex descriptor out of bounds
     }
-    if (!mtable[md].proc_count) {
-        return -1; // unexisting mutex
+    struct proc* p = myproc();
+    if (p->omutex[md] == 0) {
+        return -2; // unexisting mutex
     }
-    if (holdingsleep(&mtable[md].sl)) {
+    if (holdingsleep(&p->omutex[md]->sl)) {
         return -2; // double lock by one proc
     }
-    acquiresleep(&mtable[md].sl);
+    acquiresleep(&p->omutex[md]->sl);
     return 0;
 }
 
 int mutex_unlock(int md) {
-    if (md < 0 || md >= NMUTEX) {
+    if (md < 0 || md >= NOMUTEX) {
         return -3; // mutex descriptor out of bounds
     }
-    if (!mtable[md].proc_count) {
-        return -1; // unexisting mutex
+    struct proc* p = myproc();
+    if (p->omutex[md] == 0) {
+        return -2; // unexisting mutex
     }
-    if (!holdingsleep(&mtable[md].sl)) {
+    if (!holdingsleep(&p->omutex[md]->sl)) {
         return -2; // trying to unlock foreign mutex
     }
-    releasesleep(&mtable[md].sl);
+    releasesleep(&p->omutex[md]->sl);
     return 0;
 }
 
