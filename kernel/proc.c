@@ -3,8 +3,10 @@
 #include "memlayout.h"
 #include "riscv.h"
 #include "spinlock.h"
+#include "sleeplock.h"
 #include "proc.h"
 #include "defs.h"
+#include "mutex.h"
 
 struct cpu cpus[NCPU];
 
@@ -25,6 +27,8 @@ extern char trampoline[]; // trampoline.S
 // memory model when using p->parent.
 // must be acquired before any p->lock.
 struct spinlock wait_lock;
+
+extern struct spinlock mtable_sp;
 
 // Allocate a page for each process's kernel stack.
 // Map it high in memory, followed by an invalid
@@ -55,6 +59,9 @@ procinit(void)
       initlock(&p->lock, "proc");
       p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
+      for (int i = 0; i < NOMUTEX; ++i) {
+        p->omutex[i] = 0;
+      }
   }
 }
 
@@ -320,6 +327,17 @@ fork(void)
 
   acquire(&np->lock);
   np->state = RUNNABLE;
+
+  // Increment proc_count of every used mutex.
+  acquire(&mtable_sp);
+  for (i = 0; i < NOMUTEX; ++i) {
+    np->omutex[i] = p->omutex[i];
+    if (np->omutex[i] != 0) {
+      ++np->omutex[i]->proc_count;
+    }
+  }
+  release(&mtable_sp);
+
   release(&np->lock);
 
   return pid;
@@ -379,6 +397,15 @@ exit(int status)
   p->state = ZOMBIE;
 
   release(&wait_lock);
+
+  // Decrement proc_count of every used mutex.
+  acquire(&mtable_sp);
+  for (int i = 0; i < NOMUTEX; ++i) {
+    if (p->omutex[i] != 0) {
+      --p->omutex[i]->proc_count;
+    }
+  }
+  release(&mtable_sp);
 
   // Jump into the scheduler, never to return.
   sched();

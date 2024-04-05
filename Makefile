@@ -17,6 +17,7 @@ OBJS = \
   $K/trampoline.o \
   $K/trap.o \
   $K/syscall.o \
+  $K/sysmutex.o \
   $K/sysproc.o \
   $K/bio.o \
   $K/fs.o \
@@ -132,6 +133,7 @@ UPROGS=\
 	$U/_grind\
 	$U/_wc\
 	$U/_zombie\
+	$U/_mutextest\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
