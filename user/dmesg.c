@@ -2,6 +2,21 @@
 #include "kernel/stat.h"
 #include "user/user.h"
 
+// Example output:
+//
+// $ dmesg
+// [1] pid=1, execpath=/init
+// [1] pid=2, execpath=sh
+// [19] pid=3, execpath=ls
+// [81] pid=4, execpath=cat
+// [180] pid=5, execpath=echo
+// [214] pid=6, execpath=echo
+// [307] pid=7, execpath=ls
+// [439] pid=8, execpath=grep
+// [498] pid=10, execpath=ls
+// [498] pid=11, execpath=grep
+
+
 #define BUFSIZE 4096 * 4 + 1
 
 char* fix_buffer(char* buf) {
