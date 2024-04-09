@@ -12,3 +12,4 @@
 #define FSSIZE       2000  // size of file system in blocks
 #define MAXPATH      128   // maximum file path name
 #define NPAGES        4  // number of pages, allocated for diagnostic messages
+#define PAGESIZE   4096  // size of page for previous parameter
