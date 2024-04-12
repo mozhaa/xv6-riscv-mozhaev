@@ -187,8 +187,10 @@ devintr()
     int irq = plic_claim();
 
     if(irq == UART0_IRQ){
+      protocol_log(3, "(DEVINTR) : intr_num=%d  dev_name=\"UART\"", irq);
       uartintr();
     } else if(irq == VIRTIO0_IRQ){
+      protocol_log(3, "(DEVINTR) : intr_num=%d  dev_name=\"virtio\"", irq);
       virtio_disk_intr();
     } else if(irq){
       printf("unexpected interrupt irq=%d\n", irq);

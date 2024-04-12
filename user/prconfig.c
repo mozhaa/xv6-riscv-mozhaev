@@ -69,6 +69,10 @@ int main(int argc, char** argv) {
         timeout = -1;
     }
 
+    if (!modes) {
+        modes = 0b1111;
+    }
+
     printf("debug: %d, %d\n", modes, timeout);
     prset(modes, timeout);
 

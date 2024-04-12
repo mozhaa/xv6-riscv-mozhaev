@@ -1,3 +1,5 @@
+#include <stdarg.h>
+
 struct buf;
 struct context;
 struct file;
@@ -187,6 +189,7 @@ void            virtio_disk_intr(void);
 
 // diag.c
 void            pr_msg(const char* fmt, ...);
+void            vpr_msg(const char* fmt, va_list args);
 void            init_dmesg(void);
 
 // protocol.c

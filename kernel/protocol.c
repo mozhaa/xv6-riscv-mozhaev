@@ -70,7 +70,7 @@ void protocol_log(int mode, const char* fmt, ...) {
     if (protocolist.mode[mode - 1] > xticks) {
         va_list args;
         va_start(args, fmt);
-        pr_msg(fmt, args);
+        vpr_msg(fmt, args);
         va_end(args);
     }
 }

@@ -170,14 +170,15 @@ syscall(void)
     // and store its return value in p->trapframe->a0
 
     // protocol.c logging
+    const char* syscall_name = syscall_names[num];
     acquire(&p->lock);
     const char* proc_name = p->name;
     int proc_id = p->pid;
     release(&p->lock);
-    protocol_log(1, "SYSTEM CALL: syscall_name=\"%s\", proc_name=\"%s\", proc_id=%d", 
-            syscall_names[num], 
+    protocol_log(1, "(SYSCALL) : proc_id=%d  proc_name=\"%s\"  syscall_name=\"%s\"", 
+            proc_id,
             proc_name, 
-            proc_id);
+            syscall_name);
 
     p->trapframe->a0 = syscalls[num]();
   } else {

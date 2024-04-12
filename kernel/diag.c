@@ -97,6 +97,12 @@ static int print_dmesg_buffer(uint64 buf) {
 
 void pr_msg(const char* fmt, ...) {
     va_list ap;
+    va_start(ap, fmt);
+    vpr_msg(fmt, ap);
+    va_end(ap);
+}
+
+void vpr_msg(const char* fmt, va_list args) {
     int c;
     char* s;
 
@@ -117,7 +123,6 @@ void pr_msg(const char* fmt, ...) {
     dmesg_putc(']');
     dmesg_putc(' ');
 
-    va_start(ap, fmt);
     for (int i = 0; (c = fmt[i] & 0xff) != 0; i++) {
         if (c != '%') {
             dmesg_putc(c);
@@ -128,16 +133,16 @@ void pr_msg(const char* fmt, ...) {
             break;
         switch (c) {
         case 'd':
-            dmesg_printint(va_arg(ap, int), 10, 1);
+            dmesg_printint(va_arg(args, int), 10, 1);
             break;
         case 'x':
-            dmesg_printint(va_arg(ap, int), 16, 1);
+            dmesg_printint(va_arg(args, int), 16, 1);
             break;
         case 'p':
-            dmesg_printptr(va_arg(ap, uint64));
+            dmesg_printptr(va_arg(args, uint64));
             break;
         case 's':
-            if ((s = va_arg(ap, char*)) == 0)
+            if ((s = va_arg(args, char*)) == 0)
                 s = "(null)";
             for (; *s; s++)
                 dmesg_putc(*s);
@@ -152,13 +157,12 @@ void pr_msg(const char* fmt, ...) {
             break;
         }
     }
-    va_end(ap);
 
     dmesg_putc('\n');
 
     if (locking)
         release(&dmesg_lock.lock);
-}
+} 
 
 void init_dmesg() {
     initlock(&dmesg_lock.lock, "pr");
