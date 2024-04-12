@@ -189,5 +189,9 @@ void            virtio_disk_intr(void);
 void            pr_msg(const char* fmt, ...);
 void            init_dmesg(void);
 
+// protocol.c
+void            protocol_log(int mode, const char* fmt, ...);
+void            init_protocol(void);
+
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
