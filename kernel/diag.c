@@ -66,23 +66,29 @@ static int print_dmesg_buffer(uint64 buf) {
         return -1; // nullptr buf
 
     if (dmesg_buffer_full) {
-        // writing [current + 1, end] first
-        if (copyout(myproc()->pagetable, 
-                    buf, 
-                    dmesg_pointer + 1,
-                    sizeof(char) * (DMSIZE - (dmesg_pointer - dmesg_start) - 1)
-                    ) < 0)
-            return -2;
-        buf += sizeof(char) * (DMSIZE - (dmesg_pointer - dmesg_start) - 1);
+        char* pdmesg = dmesg_pointer;
+        while (pdmesg < dmesg_start + DMSIZE && *pdmesg != '\n')
+            ++pdmesg;
+        ++pdmesg;
+        if (pdmesg < dmesg_start + DMSIZE) {
+            // writing [current + 1, end] first
+            if (copyout(myproc()->pagetable, 
+                        buf, 
+                        pdmesg,
+                        sizeof(char) * (DMSIZE - (pdmesg - dmesg_start))
+                        ) < 0)
+                return -2;
+            buf += sizeof(char) * (DMSIZE - (pdmesg - dmesg_start));
+        }
     }
     // writing [start, current]
     if (copyout(myproc()->pagetable, 
                 buf, 
                 dmesg_start,
-                sizeof(char) * (dmesg_pointer - dmesg_start) + 1
+                sizeof(char) * (dmesg_pointer - dmesg_start)
                 ) < 0)
         return -2;
-    buf += sizeof(char) * (dmesg_pointer - dmesg_start) + 1;
+    buf += sizeof(char) * (dmesg_pointer - dmesg_start);
     // add null-terminator at the end
     if (copyout(myproc()->pagetable, 
                 buf, 
