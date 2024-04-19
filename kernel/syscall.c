@@ -169,16 +169,19 @@ syscall(void)
     // Use num to lookup the system call function for num, call it,
     // and store its return value in p->trapframe->a0
 
-    // protocol.c logging
+    // ------------------ PROTOCOL.C LOGGING ------------------------
     const char* syscall_name = syscall_names[num];
     acquire(&p->lock);
-    const char* proc_name = p->name;
+    char proc_name[16];
+    strncpy(proc_name, p->name, 16);
     int proc_id = p->pid;
     release(&p->lock);
-    protocol_log(1, "(SYSCALL) : proc_id=%d  proc_name=\"%s\"  syscall_name=\"%s\"", 
+
+    protocol_log(1, " syscall: [pid=%d  \tpname=\"%s\"  \tsyscall=\"%s\"]", 
             proc_id,
             proc_name, 
             syscall_name);
+    // ------------------ END OF PROTOCOL.C LOGGING ------------------------
 
     p->trapframe->a0 = syscalls[num]();
   } else {

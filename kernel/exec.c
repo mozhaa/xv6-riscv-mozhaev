@@ -31,12 +31,15 @@ exec(char *path, char **argv)
   pagetable_t pagetable = 0, oldpagetable;
   struct proc *p = myproc();
 
-  // protocol.c logging
+  // ------------------ PROTOCOL.C LOGGING ------------------------
   acquire(&p->lock);
-  const char* proc_name = p->name;
+  char proc_name[16];
+  strncpy(proc_name, p->name, 16);
   int proc_id = p->pid;
   release(&p->lock);
-  protocol_log(4, "(EXECCALL) : proc_id=%d  path_name=\"%s\"", proc_id, proc_name);
+
+  protocol_log(4, "execcall: [pid=%d  \tpname=\"%s\"]", proc_id, proc_name);
+  // ------------------ END OF PROTOCOL.C LOGGING ------------------------
 
   begin_op();
 

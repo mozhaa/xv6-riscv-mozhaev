@@ -39,7 +39,7 @@ static void dmesg_printptr(uint64 x) {
         dmesg_putc(digits[x >> (sizeof(uint64) * 8 - 4)]);
 }
 
-static void dmesg_printint(int xx, int base, int sign) {
+static void dmesg_printint(int xx, int base, int sign, int width) {
     char buf[16];
     int i;
     uint x;
@@ -56,6 +56,11 @@ static void dmesg_printint(int xx, int base, int sign) {
 
     if (sign)
         buf[i++] = '-';
+
+    // aligning
+    int j = i;
+    while (--width >= j)
+        buf[i++] = ' ';
 
     while (--i >= 0)
         dmesg_putc(buf[i]);
@@ -122,7 +127,7 @@ void vpr_msg(const char* fmt, va_list args) {
     uint xticks = ticks;
 
     dmesg_putc('[');
-    dmesg_printint(xticks, 10, 1);
+    dmesg_printint(xticks, 10, 1, 6);
     dmesg_putc(']');
     dmesg_putc(' ');
 
@@ -136,10 +141,10 @@ void vpr_msg(const char* fmt, va_list args) {
             break;
         switch (c) {
         case 'd':
-            dmesg_printint(va_arg(args, int), 10, 1);
+            dmesg_printint(va_arg(args, int), 10, 1, 0);
             break;
         case 'x':
-            dmesg_printint(va_arg(args, int), 16, 1);
+            dmesg_printint(va_arg(args, int), 16, 1, 0);
             break;
         case 'p':
             dmesg_printptr(va_arg(args, uint64));

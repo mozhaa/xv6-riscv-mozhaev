@@ -462,6 +462,10 @@ scheduler(void)
         c->proc = p;
         swtch(&c->context, &p->context);
 
+        // ------------------ PROTOCOL.C LOGGING ------------------------
+        protocol_log(3, "  switch: [pid=%d  \tpname=\"%s\"]", p->pid, p->name);
+        // ------------------ END OF PROTOCOL.C LOGGING ------------------------
+
         // Process is done running for now.
         // It should have changed its p->state before coming back.
         c->proc = 0;
