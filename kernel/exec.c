@@ -31,6 +31,16 @@ exec(char *path, char **argv)
   pagetable_t pagetable = 0, oldpagetable;
   struct proc *p = myproc();
 
+  // ------------------ PROTOCOL.C LOGGING ------------------------
+  acquire(&p->lock);
+  char proc_name[16];
+  strncpy(proc_name, p->name, 16);
+  int proc_id = p->pid;
+  release(&p->lock);
+
+  protocol_log(4, "execcall: [pid=%d pname=\"%s\"]", proc_id, proc_name);
+  // ------------------ END OF PROTOCOL.C LOGGING ------------------------
+
   begin_op();
 
   if((ip = namei(path)) == 0){

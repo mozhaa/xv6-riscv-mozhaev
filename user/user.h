@@ -22,6 +22,8 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int dmesg(char* buf);
+int prset(int modes, int rticks, int option_dump);
 
 // ulib.c
 int stat(const char*, struct stat*);

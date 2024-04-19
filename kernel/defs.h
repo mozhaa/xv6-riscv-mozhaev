@@ -1,3 +1,5 @@
+#include <stdarg.h>
+
 struct buf;
 struct context;
 struct file;
@@ -184,6 +186,16 @@ void            plic_complete(int);
 void            virtio_disk_init(void);
 void            virtio_disk_rw(struct buf *, int);
 void            virtio_disk_intr(void);
+
+// diag.c
+void            pr_msg(const char* fmt, ...);
+void            vpr_msg(const char* fmt, va_list args);
+void            init_dmesg(void);
+
+// protocol.c
+int             protocol_checkdump(void);
+void            protocol_log(int mode, const char* fmt, ...);
+void            init_protocol(void);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

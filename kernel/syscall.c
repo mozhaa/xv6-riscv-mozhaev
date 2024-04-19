@@ -101,6 +101,8 @@ extern uint64 sys_unlink(void);
 extern uint64 sys_link(void);
 extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
+extern uint64 sys_dmesg(void);
+extern uint64 sys_prset(void);
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -126,6 +128,34 @@ static uint64 (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+[SYS_dmesg]   sys_dmesg,
+[SYS_prset]   sys_prset,
+};
+
+static const char* syscall_names[] = {
+[SYS_fork]    "sys_fork",
+[SYS_exit]    "sys_exit",
+[SYS_wait]    "sys_wait",
+[SYS_pipe]    "sys_pipe",
+[SYS_read]    "sys_read",
+[SYS_kill]    "sys_kill",
+[SYS_exec]    "sys_exec",
+[SYS_fstat]   "sys_fstat",
+[SYS_chdir]   "sys_chdir",
+[SYS_dup]     "sys_dup",
+[SYS_getpid]  "sys_getpid",
+[SYS_sbrk]    "sys_sbrk",
+[SYS_sleep]   "sys_sleep",
+[SYS_uptime]  "sys_uptime",
+[SYS_open]    "sys_open",
+[SYS_write]   "sys_write",
+[SYS_mknod]   "sys_mknod",
+[SYS_unlink]  "sys_unlink",
+[SYS_link]    "sys_link",
+[SYS_mkdir]   "sys_mkdir",
+[SYS_close]   "sys_close",
+[SYS_dmesg]   "sys_dmesg",
+[SYS_prset]   "sys_prset",
 };
 
 void
@@ -138,6 +168,21 @@ syscall(void)
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     // Use num to lookup the system call function for num, call it,
     // and store its return value in p->trapframe->a0
+
+    // ------------------ PROTOCOL.C LOGGING ------------------------
+    const char* syscall_name = syscall_names[num];
+    acquire(&p->lock);
+    char proc_name[16];
+    strncpy(proc_name, p->name, 16);
+    int proc_id = p->pid;
+    release(&p->lock);
+
+    protocol_log(1, " syscall: [pid=%d pname=\"%s\" syscall=\"%s\"]", 
+            proc_id,
+            proc_name, 
+            syscall_name);
+    // ------------------ END OF PROTOCOL.C LOGGING ------------------------
+
     p->trapframe->a0 = syscalls[num]();
   } else {
     printf("%d %s: unknown sys call %d\n",
