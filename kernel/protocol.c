@@ -17,14 +17,15 @@
 struct {
     struct spinlock lock;
     uint mode[NMODES];
+    int option_dump;
     // Modes:
     // 1) syscalls
     // 2) dev. interrupts
-    // 3) proc switches
+    // 3) proc switches ('dump' option for printing dumps)
     // 4) exec calls
 } protocolist;
 
-static void set_modes(int modes, int rticks) {
+static void set_modes(int modes, int rticks, int option_dump) {
     // `modes` in format 0bABCD, where D - 1st mode, C - 2nd, ...
     // `rticks`: positive for timeout set, zero for no timeout, negative for disable
     // 
@@ -52,10 +53,15 @@ static void set_modes(int modes, int rticks) {
     }
 
     acquire(&protocolist.lock);
+    protocolist.option_dump = option_dump;
     for (int m = 1, i = 0; i < NMODES; m <<= 1, ++i)
         if (modes & m)
             protocolist.mode[i] = rticks;
     release(&protocolist.lock);
+}
+
+int protocol_checkdump(void) {
+    return protocolist.option_dump;
 }
 
 void protocol_log(int mode, const char* fmt, ...) {
@@ -80,9 +86,10 @@ void init_protocol(void) {
 // SYSCALLS
 
 uint64 sys_prset(void) {
-    int modes, rticks;
+    int modes, rticks, option_dump;
     argint(0, &modes);
     argint(1, &rticks);
-    set_modes(modes, rticks);
+    argint(2, &option_dump);
+    set_modes(modes, rticks, option_dump);
     return 0;
 }

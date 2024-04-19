@@ -193,6 +193,7 @@ void            vpr_msg(const char* fmt, va_list args);
 void            init_dmesg(void);
 
 // protocol.c
+int             protocol_checkdump(void);
 void            protocol_log(int mode, const char* fmt, ...);
 void            init_protocol(void);
 

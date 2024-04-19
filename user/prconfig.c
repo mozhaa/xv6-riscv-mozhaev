@@ -3,15 +3,22 @@
 #include "user/user.h"
 
 #define HELPMSG \
-"Usage: `prconfig <-e(nable)/-d(isable)> [-t timeout] <modes>`\n" \
+"Usage: `prconfig [-e/-d] [-t timeout] [-l] [modes]`\n" \
 "   modes: [s][d][p][e]\n" \
 "       s - system calls\n" \
 "       d - dev interrupts\n" \
 "       p - proc switches\n" \
 "       e - exec calls\n" \
+"       (default: all modes)\n" \
+"Flags:\n" \
+"   -e/-d - enable/disable modes (default: enabled)\n" \
+"   -t timeout - set timeout in ticks (default: no timeout)\n" \
+"   -l - enable 'long' mode (print registers dumps in 'proc switches' mode) (default: disabled)\n" \
 "Examples:\n" \
+"   `prconfig` -- print this help message\n" \
 "   `prconfig -e s` -- enable s mode\n" \
 "   `prconfig -e -t 1000 d` -- enable d mode for 1000 ticks\n" \
+"   `prconfig -e -t 20 -l p` -- enable p mode for 20 ticks in 'long' mode\n" \
 "   `prconfig -d sdpe` -- disable all modes\n"
 
 const char* modeslist = "sdpe";
@@ -22,7 +29,7 @@ int main(int argc, char** argv) {
         exit(-1);
     }
 
-    int enable = 1, modes = 0, timeout = 0;
+    int enable = 1, modes = 0, timeout = 0, option_dump = 0;
     for (int i = 1; i < argc; ++i) {
         if (argv[i][0] == '-') {
             if (argv[i][2] != 0) {
@@ -35,6 +42,10 @@ int main(int argc, char** argv) {
             }
             if (argv[i][1] == 'd') {
                 enable = 0;
+                continue;
+            }
+            if (argv[i][1] == 'l') {
+                option_dump = 1;
                 continue;
             }
             if (argv[i][1] == 't') {
@@ -73,8 +84,7 @@ int main(int argc, char** argv) {
         modes = 0b1111;
     }
 
-    printf("debug: %d, %d\n", modes, timeout);
-    prset(modes, timeout);
+    prset(modes, timeout, option_dump);
 
     exit(0);
 }

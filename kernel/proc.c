@@ -463,7 +463,29 @@ scheduler(void)
         swtch(&c->context, &p->context);
 
         // ------------------ PROTOCOL.C LOGGING ------------------------
-        protocol_log(3, "  switch: [pid=%d pname=\"%s\"]", p->pid, p->name);
+        if (protocol_checkdump())
+            protocol_log(3, "  switch: [pid=%d pname=\"%s\"]\n"
+                "\t  old_dump=\n"
+                "\t\t[ra=%d, sp=%d, s0=%d, s1=%d, \n"
+                "\t\t s2=%d, s3=%d, s4=%d, s5=%d, \n"
+                "\t\t s6=%d, s7=%d, s8=%d, s9=%d, \n"
+                "\t\t s10=%d, s11=%d]\n"
+                "\t  new_dump=\n"
+                "\t\t[ra=%d, sp=%d, s0=%d, s1=%d, \n"
+                "\t\t s2=%d, s3=%d, s4=%d, s5=%d, \n"
+                "\t\t s6=%d, s7=%d, s8=%d, s9=%d, \n"
+                "\t\t s10=%d, s11=%d]", 
+                p->pid, p->name, 
+                c->context.ra, c->context.sp, c->context.s0, c->context.s1, 
+                c->context.s2, c->context.s3, c->context.s4, c->context.s5, 
+                c->context.s6, c->context.s7, c->context.s8, c->context.s9, 
+                c->context.s10, c->context.s11, 
+                p->context.ra, p->context.sp, p->context.s0, p->context.s1, 
+                p->context.s2, p->context.s3, p->context.s4, p->context.s5, 
+                p->context.s6, p->context.s7, p->context.s8, p->context.s9, 
+                p->context.s10, p->context.s11);
+        else
+            protocol_log(3, "  switch: [pid=%d pname=\"%s\"]", p->pid, p->name);
         // ------------------ END OF PROTOCOL.C LOGGING ------------------------
 
         // Process is done running for now.
