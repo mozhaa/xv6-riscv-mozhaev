@@ -188,12 +188,12 @@ devintr()
 
     if(irq == UART0_IRQ){
       // ------------------ PROTOCOL.C LOGGING ------------------------
-      protocol_log(2, " devintr: [irq=%d  \t  dev=\"UART\"]", irq);
+      protocol_log(2, " devintr: [irq=%d dev=\"UART\"]", irq);
       // ------------------ END OF PROTOCOL.C LOGGING ------------------------
       uartintr();
     } else if(irq == VIRTIO0_IRQ){
       // ------------------ PROTOCOL.C LOGGING ------------------------
-      protocol_log(2, " devintr: [irq=%d  \t  dev=\"virtio\"]", irq);
+      protocol_log(2, " devintr: [irq=%d dev=\"virtio\"]", irq);
       // ------------------ END OF PROTOCOL.C LOGGING ------------------------
       virtio_disk_intr();
     } else if(irq){

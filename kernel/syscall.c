@@ -177,7 +177,7 @@ syscall(void)
     int proc_id = p->pid;
     release(&p->lock);
 
-    protocol_log(1, " syscall: [pid=%d  \tpname=\"%s\"  \tsyscall=\"%s\"]", 
+    protocol_log(1, " syscall: [pid=%d pname=\"%s\" syscall=\"%s\"]", 
             proc_id,
             proc_name, 
             syscall_name);

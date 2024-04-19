@@ -38,7 +38,7 @@ exec(char *path, char **argv)
   int proc_id = p->pid;
   release(&p->lock);
 
-  protocol_log(4, "execcall: [pid=%d  \tpname=\"%s\"]", proc_id, proc_name);
+  protocol_log(4, "execcall: [pid=%d pname=\"%s\"]", proc_id, proc_name);
   // ------------------ END OF PROTOCOL.C LOGGING ------------------------
 
   begin_op();
