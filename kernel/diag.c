@@ -119,10 +119,7 @@ void vpr_msg(const char* fmt, va_list args) {
     if (fmt == 0)
         panic("null fmt");
 
-    uint xticks;
-    acquire(&tickslock);
-    xticks = ticks;
-    release(&tickslock);
+    uint xticks = ticks;
 
     dmesg_putc('[');
     dmesg_printint(xticks, 10, 1);

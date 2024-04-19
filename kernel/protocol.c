@@ -36,9 +36,7 @@ static void set_modes(int modes, int rticks) {
     if (rticks > 0) {
         // enable with timeout
         
-        acquire(&tickslock);
         uint xticks = ticks;
-        release(&tickslock);
 
         xticks += rticks;
         // unsigned int overflow check
@@ -63,9 +61,7 @@ static void set_modes(int modes, int rticks) {
 void protocol_log(int mode, const char* fmt, ...) {
     // mode counted from 1
 
-    acquire(&tickslock);
     uint xticks = ticks;
-    release(&tickslock);
 
     if (protocolist.mode[mode - 1] > xticks) {
         va_list args;
