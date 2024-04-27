@@ -327,6 +327,7 @@ sys_open(void)
         end_op();
         return -1;
     }
+    pr_msg("path=\"%s\", type=%d, i=%d, size=%d", path, ip->type, ip->inum, ip->size);
     while (ip->type == T_SYMLINK) {
         // follow
         if ((target_size = read_symlink(path, target)) < 0) {
@@ -338,6 +339,7 @@ sys_open(void)
             end_op();
             return -3;
         }
+        pr_msg("following: path=\"%s\", type=%d", path, ip->type);
     }
     ilock(ip);
     if(ip->type == T_DIR && omode != O_RDONLY){
