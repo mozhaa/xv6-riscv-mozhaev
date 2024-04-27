@@ -304,11 +304,11 @@ create(char *path, short type, short major, short minor)
 uint64
 sys_open(void)
 {
-  char path[MAXPATH];
+  char path[MAXPATH], target[MAXPATH];
   int fd, omode;
   struct file *f;
   struct inode *ip;
-  int n;
+  int n, target_size;
 
   argint(1, &omode);
   if((n = argstr(0, path, MAXPATH)) < 0)
@@ -324,8 +324,20 @@ sys_open(void)
     }
   } else {
     if((ip = namei(path)) == 0){
-      end_op();
-      return -1;
+        end_op();
+        return -1;
+    }
+    while (ip->type == T_SYMLINK) {
+        // follow
+        if ((target_size = read_symlink(path, target)) < 0) {
+            end_op();
+            return -2;
+        }
+        strncpy(path, target, target_size);
+        if((ip = namei(path)) == 0){
+            end_op();
+            return -3;
+        }
     }
     ilock(ip);
     if(ip->type == T_DIR && omode != O_RDONLY){

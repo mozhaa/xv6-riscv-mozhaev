@@ -2,6 +2,7 @@
 #include "kernel/stat.h"
 #include "user/user.h"
 #include "kernel/fs.h"
+#include "kernel/param.h"
 
 char*
 fmtname(char *path)
@@ -25,7 +26,7 @@ fmtname(char *path)
 void
 ls(char *path)
 {
-  char buf[512], *p;
+  char buf[512], *p, target[MAXPATH];
   int fd;
   struct dirent de;
   struct stat st;
@@ -64,9 +65,25 @@ ls(char *path)
         printf("ls: cannot stat %s\n", buf);
         continue;
       }
-      printf("%s %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
+      if (st.type == T_SYMLINK) {
+        if (readlink(buf, target) < 0) {
+          fprintf(2, "error while reading symlink %s target\n", path);
+          exit(-1);
+        }
+        printf("%s %d %d %d -> %s\n", fmtname(buf), st.type, st.ino, st.size, target);    
+      } else {
+        printf("%s %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
+      }
     }
     break;
+  case T_SYMLINK:
+    if (readlink(path, target) < 0) {
+        fprintf(2, "error while reading symlink %s target\n", path);
+        exit(-1);
+    }
+    printf("%s %d %d %d -> %s\n", fmtname(path), st.type, st.ino, st.size, fmtname(target));
+    break;
+
   }
   close(fd);
 }
