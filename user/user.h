@@ -24,6 +24,7 @@ int sleep(int);
 int uptime(void);
 int symlink(const char *target, const char *filename);
 int readlink(const char *filename, char *buf);
+int dmesg(char* buf);
 
 // ulib.c
 int stat(const char*, struct stat*);

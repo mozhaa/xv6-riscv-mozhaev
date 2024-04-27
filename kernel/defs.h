@@ -188,5 +188,9 @@ void            virtio_disk_intr(void);
 // symlink.c
 int             read_symlink(char* filename, char* buf);
 
+// diag.c
+void            pr_msg(const char* fmt, ...);
+void            init_dmesg(void);
+
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

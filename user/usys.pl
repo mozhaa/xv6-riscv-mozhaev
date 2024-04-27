@@ -38,3 +38,4 @@ entry("sleep");
 entry("uptime");
 entry("symlink");
 entry("readlink");
+entry("dmesg");
