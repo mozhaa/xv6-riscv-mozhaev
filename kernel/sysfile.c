@@ -317,6 +317,7 @@ sys_open(void)
   begin_op();
 
   if(omode & O_CREATE){
+    pr_msg("create %s", path);
     ip = create(path, T_FILE, 0, 0);
     if(ip == 0){
       end_op();
@@ -327,7 +328,7 @@ sys_open(void)
         end_op();
         return -1;
     }
-    pr_msg("path=\"%s\", type=%d, i=%d, size=%d", path, ip->type, ip->inum, ip->size);
+    pr_msg("open path=\"%s\", type=%d, i=%d, size=%d", path, ip->type, ip->inum, ip->size);
     while (ip->type == T_SYMLINK) {
         // follow
         if ((target_size = read_symlink(path, target)) < 0) {

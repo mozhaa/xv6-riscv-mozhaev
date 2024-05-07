@@ -14,9 +14,11 @@ static int create_symlink(const char* target, char* filename) {
 	char name[DIRSIZ];
 	struct inode *dp;
 
+    pr_msg("creating symlink: %s -> %s", filename, target);
 	begin_op();
 	if ((dp = nameiparent(filename, name)) == 0) {
         // invalid filename
+        pr_msg("file %s does not exist", filename);
 		end_op();
         return -1;
     }
@@ -24,6 +26,7 @@ static int create_symlink(const char* target, char* filename) {
     struct inode* ip = ialloc(dp->dev, T_SYMLINK);
     if (ip == 0) {
         // failed to allocate inode 
+        pr_msg("failed to allocate inode");
         iunlockput(dp);
 		end_op();
         return -2;
@@ -33,6 +36,7 @@ static int create_symlink(const char* target, char* filename) {
     iupdate(ip);
 	if (dirlink(dp, name, ip->inum) < 0) {
         // failed to write dir entry to parent dir
+        pr_msg("failed to dirlink(%d, %s, %d)", dp->inum, name, ip->inum);
 		iunlockput(dp);
         --ip->nlink;
         iupdate(ip);
@@ -43,6 +47,7 @@ static int create_symlink(const char* target, char* filename) {
     int target_len = strlen(target);
     if (writei(ip, 0, (uint64)target, 0, target_len) < target_len) {
         // failed to write target path into symlink file
+        pr_msg("failed to write target path to symlink");
         iunlockput(dp);
         --ip->nlink;
         iupdate(ip);
@@ -52,6 +57,7 @@ static int create_symlink(const char* target, char* filename) {
     }
 	iunlockput(dp);
 	iunlockput(ip);
+    pr_msg("symlink has been succesfully created");
 
 	end_op();
 
