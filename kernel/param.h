@@ -9,7 +9,7 @@
 #define MAXOPBLOCKS  10  // max # of blocks any FS op writes
 #define LOGSIZE      (MAXOPBLOCKS*3)  // max data blocks in on-disk log
 #define NBUF         (MAXOPBLOCKS*3)  // size of disk block cache
-#define FSSIZE       2000  // size of file system in blocks
+#define FSSIZE       400000  // size of file system in blocks
 #define MAXPATH      128   // maximum file path name
 #define NPAGES        4  // number of pages, allocated for diagnostic messages
 #define PAGESIZE   4096  // size of page for previous parameter
