@@ -424,7 +424,7 @@ bmap(struct inode *ip, uint bn)
   uint dbn = bn / NINDIRECT, dbi = bn % NINDIRECT;
 
   if (dbn < NINDIRECT) {
-    if ((addr = ip->addrs[NINDIRECT]) == 0) {
+    if ((addr = ip->addrs[NDIRECT + 1]) == 0) {
         // allocate memory for double indirect block
         if ((addr = balloc(ip->dev)) == 0)
             return 0;
