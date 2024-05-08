@@ -369,6 +369,21 @@ iunlockput(struct inode *ip)
   iput(ip);
 }
 
+static uint ldindb(uint bn, uint addr, struct inode* ip) {
+  uint* a;
+  struct buf* bp = bread(ip->dev, addr);
+  a = (uint*)bp->data;
+  if((addr = a[bn]) == 0){
+    addr = balloc(ip->dev);
+    if(addr){
+      a[bn] = addr;
+      log_write(bp);
+    }
+  }
+  brelse(bp);
+  return addr;
+}
+
 // Inode content
 //
 // The content (data) associated with each inode is stored
@@ -382,8 +397,7 @@ iunlockput(struct inode *ip)
 static uint
 bmap(struct inode *ip, uint bn)
 {
-  uint addr, *a;
-  struct buf *bp;
+  uint addr;
 
   if(bn < NDIRECT){
     if((addr = ip->addrs[bn]) == 0){
@@ -404,17 +418,22 @@ bmap(struct inode *ip, uint bn)
         return 0;
       ip->addrs[NDIRECT] = addr;
     }
-    bp = bread(ip->dev, addr);
-    a = (uint*)bp->data;
-    if((addr = a[bn]) == 0){
-      addr = balloc(ip->dev);
-      if(addr){
-        a[bn] = addr;
-        log_write(bp);
-      }
+    return ldindb(bn, addr, ip);
+  }
+  bn -= NINDIRECT;
+  uint dbn = bn / NINDIRECT, dbi = bn % NINDIRECT;
+
+  if (dbn < NINDIRECT) {
+    if ((addr = ip->addrs[NDIRECT + 1]) == 0) {
+        // allocate memory for double indirect block
+        if ((addr = balloc(ip->dev)) == 0)
+            return 0;
+        ip->addrs[NDIRECT + 1] = addr;
     }
-    brelse(bp);
-    return addr;
+    addr = ldindb(dbn, addr, ip);
+    if (addr == 0)
+        return 0;
+    return ldindb(dbi, addr, ip);
   }
 
   panic("bmap: out of range");
