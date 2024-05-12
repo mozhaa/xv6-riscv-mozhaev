@@ -256,6 +256,10 @@ create(char *path, short type, short major, short minor)
   if((ip = dirlookup(dp, name, 0)) != 0){
     iunlockput(dp);
     ilock(ip);
+    if (type == T_SYMLINK) {
+        pr_msg("%s: ip->type = %d", path, ip->type);
+        return ip;
+    }
     if(type == T_FILE && (ip->type == T_FILE || ip->type == T_DEVICE))
       return ip;
     iunlockput(ip);
@@ -304,11 +308,11 @@ create(char *path, short type, short major, short minor)
 uint64
 sys_open(void)
 {
-  char path[MAXPATH], target[MAXPATH];
+  char path[MAXPATH];
   int fd, omode;
   struct file *f;
   struct inode *ip;
-  int n, target_size;
+  int n;
 
   argint(1, &omode);
   if((n = argstr(0, path, MAXPATH)) < 0)
@@ -317,7 +321,6 @@ sys_open(void)
   begin_op();
 
   if(omode & O_CREATE){
-    pr_msg("create %s", path);
     ip = create(path, T_FILE, 0, 0);
     if(ip == 0){
       end_op();
@@ -328,22 +331,63 @@ sys_open(void)
         end_op();
         return -1;
     }
-    pr_msg("open path=\"%s\", type=%d, i=%d, size=%d", path, ip->type, ip->inum, ip->size);
-    while (ip->type == T_SYMLINK) {
-        // follow
-        if ((target_size = read_symlink(path, target)) < 0) {
-            end_op();
-            return -2;
-        }
-        strncpy(path, target, target_size);
-        if((ip = namei(path)) == 0){
-            end_op();
-            return -3;
-        }
-        pr_msg("following: path=\"%s\", type=%d", path, ip->type);
-    }
     ilock(ip);
-    if(ip->type == T_DIR && omode != O_RDONLY){
+    if (!(omode & O_NOFOLLOW)) {
+        // follow symlinks recursively
+        int rec_depth = SYMLNKREC, pathsize = strlen(path);
+        while (ip->type == T_SYMLINK) {
+            if (--rec_depth < 0) {
+                // recursion limit exceeded
+                iunlock(ip);
+                end_op();
+                return -1;
+            }
+            char rpath[MAXPATH];
+            memset(rpath, 0, MAXPATH);
+            // read symlink target to rpath
+            if (readi(ip, 0, (uint64)rpath, 0, MAXPATH) < 0) {
+                iunlock(ip);
+                end_op();
+                return -1;
+            }
+            iunlock(ip);
+            if (rpath[0] == '/') {
+                // absolute path
+                // copy absolute path to path
+                safestrcpy(path, rpath, MAXPATH);
+                pathsize = strlen(path);
+            } else {
+                // relative path
+                for (; pathsize > 0; --pathsize) {
+                    // cut path's tail till the nearest '/' or till the beginning
+                    // '/dir1/dir2/symlink' -> '/dir1/dir2/'
+                    // 'symlink' -> ''
+                    if (path[pathsize - 1] == '/') {
+                        break;
+                    }
+                }
+                if ((pathsize + strlen(rpath) + 1) > MAXPATH) {
+                    // path size limit exceeded
+                    end_op();
+                    return -1;
+                }
+                for (int i = 0; i < MAXPATH && rpath[i]; ++i) {
+                    // copy relative path to the end of path
+                    // path = '/dir1/dir2/', rpath = 'file' -> path = '/dir1/dir2/file'
+                    // path = '', rpath = 'file' -> path = 'file'
+                    path[pathsize++] = rpath[i];
+                }
+                // null-terminator
+                path[pathsize] = 0;
+            }
+            if((ip = namei(path)) == 0){
+                end_op();
+                return -1;
+            }
+            ilock(ip);
+        }
+    }
+    if(ip->type == T_DIR && omode != O_RDONLY && omode != O_NOFOLLOW){
       iunlockput(ip);
       end_op();
       return -1;

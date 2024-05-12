@@ -34,7 +34,6 @@ main(int argc, char *argv[])
     if (link(target, fn) < 0)
       fprintf(2, "link %s %s: failed\n", target, fn);
   } else {
-    printf("creating link %s -> %s\n", fn, target);
     if (symlink(target, fn) < 0)
       fprintf(2, "symlink %s %s: failed\n", target, fn);
   }
