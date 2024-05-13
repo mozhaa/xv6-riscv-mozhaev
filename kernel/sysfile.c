@@ -340,7 +340,7 @@ sys_open(void)
                 // recursion limit exceeded
                 iunlock(ip);
                 end_op();
-                return -1;
+                return -42;
             }
             char rpath[MAXPATH];
             memset(rpath, 0, MAXPATH);
@@ -382,7 +382,7 @@ sys_open(void)
             }
             if((ip = namei(path)) == 0){
                 end_op();
-                return -1;
+                return -89;
             }
             ilock(ip);
         }
