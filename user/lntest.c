@@ -5,8 +5,6 @@
 
 #define BUFSIZE 128
 #define rd1 "tr1"
-#define rd2 "tr2"
-#define rd3 "tr3"
 #define RECLIMCODE -42
 #define NOSUCHFILECODE -89
 
@@ -110,6 +108,8 @@ static int test_3() {
     } 
 	int t3_1 = common_test(rd1 "/" d2 "/" d3 "/f31", "l31", "hPSArXfFD4", "3.1");
     int t3_2 = common_test("./" rd1 "/" d2 "/" d3 "/f32", "l32", "2Y5lqqwnQS", "3.2");
+	unlink(rd1 "/" d2 "/" d3);
+	unlink(rd1 "/" d2);
     return t3_1 | t3_2;
 
 #undef d2
@@ -132,9 +132,9 @@ static int test_4() {
     } 
 	int t4_1 = common_test("../../../f41", rd1 "/" d2 "/" d3 "/l41", "IL1jxxRgqw", "4.1");
     int t4_2 = common_test("../../../f42", "./" rd1 "/" d2 "/" d3 "/l42", "qJQw0lXWjS", "4.2");
+	unlink(rd1 "/" d2 "/" d3);
+	unlink(rd1 "/" d2);
     return t4_1 | t4_2;
-
-	return 0;
 
 #undef d2
 #undef d3
@@ -159,24 +159,34 @@ static int test_5() {
 			   mkdir(rd1 "/" d2 "/" d3);
     if (prep != 0) {
         fprintf(2, "[TEST\t%s]: Failed to create directories.\n", testname);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
         return 1;
     } 
 	if (create_file(fp, "NuPy7LOMU5", testname) != 0) {
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 2;
 	}
 	if (create_link(fp, s1, testname) != 0) {
 		unlink(fp);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 3;
 	}
 	if (create_link(s1, s2, testname) != 0) {
 		unlink(fp);
 		unlink(s1);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 3;
 	}
 	if (create_link(s2, s3, testname) != 0) {
 		unlink(fp);
 		unlink(s1);
 		unlink(s2);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 3;
 	}
 	if (check_link_content(s3, data, testname) != 0) {
@@ -184,6 +194,8 @@ static int test_5() {
 		unlink(s1);
 		unlink(s2);
 		unlink(s3);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 4;
 	}
 	if (check_link_content(s2, data, testname) != 0) {
@@ -191,6 +203,8 @@ static int test_5() {
 		unlink(s1);
 		unlink(s2);
 		unlink(s3);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 4;
 	}
 	if (check_link_content(s1, data, testname) != 0) {
@@ -198,6 +212,8 @@ static int test_5() {
 		unlink(s1);
 		unlink(s2);
 		unlink(s3);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 4;
 	}
 
@@ -205,6 +221,8 @@ static int test_5() {
 	unlink(s1);
 	unlink(s2);
 	unlink(s3);
+	unlink(rd1 "/" d2 "/" d3);
+	unlink(rd1 "/" d2);
 	fprintf(2, "[TEST\t%s]: Test success.\n", testname);
 	return 0;
 
@@ -234,24 +252,34 @@ static int test_6() {
 			   mkdir(rd1 "/" d2 "/" d3);
     if (prep != 0) {
         fprintf(2, "[TEST\t%s]: Failed to create directories.\n", testname);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
         return 1;
     } 
 	if (create_file(afp, data, testname) != 0) {
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 2;
 	}
 	if (create_link(fp, s1, testname) != 0) {
 		unlink(afp);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 3;
 	}
 	if (create_link(s1, as2, testname) != 0) {
 		unlink(afp);
 		unlink(s1);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 3;
 	}
 	if (create_link(s2, s3, testname) != 0) {
 		unlink(afp);
 		unlink(s1);
 		unlink(as2);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 3;
 	}
 	if (check_link_content(s3, data, testname) != 0) {
@@ -259,6 +287,8 @@ static int test_6() {
 		unlink(s1);
 		unlink(as2);
 		unlink(s3);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 4;
 	}
 	if (check_link_content(as2, data, testname) != 0) {
@@ -266,6 +296,8 @@ static int test_6() {
 		unlink(s1);
 		unlink(as2);
 		unlink(s3);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 4;
 	}
 	if (check_link_content(s1, data, testname) != 0) {
@@ -273,6 +305,8 @@ static int test_6() {
 		unlink(s1);
 		unlink(as2);
 		unlink(s3);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 4;
 	}
 
@@ -280,6 +314,8 @@ static int test_6() {
 	unlink(s1);
 	unlink(as2);
 	unlink(s3);
+	unlink(rd1 "/" d2 "/" d3);
+	unlink(rd1 "/" d2);
 	fprintf(2, "[TEST\t%s]: Test success.\n", testname);
 	return 0;
 
@@ -297,37 +333,47 @@ static int test_7() {
 #define d3 "t7dd"
 	
 	const char* fp = "f71";
-	const char* afp = "/" rd2 "/" d2 "/f71";
-	const char* as1 = "/" rd2 "/" d2 "/l71";
+	const char* afp = "/" rd1 "/" d2 "/f71";
+	const char* as1 = "/" rd1 "/" d2 "/l71";
 	const char* s1 = d2 "/l71";
-	const char* as2 = "/" rd2 "/l72";
+	const char* as2 = "/" rd1 "/l72";
 	const char* s2 = "../../l72";
-	const char* as3 = "/" rd2 "/" d2 "/" d3 "/l73";
+	const char* as3 = "/" rd1 "/" d2 "/" d3 "/l73";
 	const char* data = "FiShBXj3ki";
 	const char* testname = "7";
 
-    int prep = mkdir(rd2 "/" d2) |
-			   mkdir(rd2 "/" d2 "/" d3);
+    int prep = mkdir(rd1 "/" d2) |
+			   mkdir(rd1 "/" d2 "/" d3);
     if (prep != 0) {
         fprintf(2, "[TEST\t%s]: Failed to create directories.\n", testname);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
         return 1;
     } 
 	if (create_file(afp, data, testname) != 0) {
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 2;
 	}
 	if (create_link(fp, as1, testname) != 0) {
 		unlink(afp);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 3;
 	}
 	if (create_link(s1, as2, testname) != 0) {
 		unlink(afp);
 		unlink(as1);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 3;
 	}
 	if (create_link(s2, as3, testname) != 0) {
 		unlink(afp);
 		unlink(as1);
 		unlink(as2);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 3;
 	}
 	if (check_link_content(as3, data, testname) != 0) {
@@ -335,6 +381,8 @@ static int test_7() {
 		unlink(as1);
 		unlink(as2);
 		unlink(as3);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 4;
 	}
 	if (check_link_content(as2, data, testname) != 0) {
@@ -342,6 +390,8 @@ static int test_7() {
 		unlink(as1);
 		unlink(as2);
 		unlink(as3);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 4;
 	}
 	if (check_link_content(as1, data, testname) != 0) {
@@ -349,6 +399,8 @@ static int test_7() {
 		unlink(as1);
 		unlink(as2);
 		unlink(as3);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 4;
 	}
 
@@ -356,6 +408,8 @@ static int test_7() {
 	unlink(as1);
 	unlink(as2);
 	unlink(as3);
+	unlink(rd1 "/" d2 "/" d3);
+	unlink(rd1 "/" d2);
 	fprintf(2, "[TEST\t%s]: Test success.\n", testname);
 	return 0;
 
@@ -371,28 +425,36 @@ static int test_8() {
 #define d2 "t8d"
 #define d3 "t8dd"
 	
-	const char* as1 = "/" rd2 "/" d2 "/l81";
-	const char* as2 = "/" rd2 "/l82";
-	const char* as3 = "/" rd2 "/" d2 "/" d3 "/l83";
+	const char* as1 = "/" rd1 "/" d2 "/l81";
+	const char* as2 = "/" rd1 "/l82";
+	const char* as3 = "/" rd1 "/" d2 "/" d3 "/l83";
 	const char* data = "FiShBXj3ki";
 	const char* testname = "8";
 
-    int prep = mkdir(rd2 "/" d2) |
-			   mkdir(rd2 "/" d2 "/" d3);
+    int prep = mkdir(rd1 "/" d2) |
+			   mkdir(rd1 "/" d2 "/" d3);
     if (prep != 0) {
         fprintf(2, "[TEST\t%s]: Failed to create directories.\n", testname);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
         return 1;
     } 
 	if (create_file(as1, data, testname) != 0) {
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 2;
 	}
 	if (create_link(as1, as2, testname) != 0) {
 		unlink(as1);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 3;
 	}
 	if (create_link(as2, as3, testname) != 0) {
 		unlink(as1);
 		unlink(as2);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 3;
 	}
 	// remove file as1
@@ -401,6 +463,8 @@ static int test_8() {
 	if (create_link(as3, as1, testname) != 0) {
 		unlink(as2);
 		unlink(as3);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 3;
 	}
 	if (open(as1, O_RDONLY) != RECLIMCODE) {
@@ -408,6 +472,8 @@ static int test_8() {
 		unlink(as1);
 		unlink(as2);
 		unlink(as3);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 5;
 	}
 	if (open(as2, O_RDONLY) != RECLIMCODE) {
@@ -415,6 +481,8 @@ static int test_8() {
 		unlink(as1);
 		unlink(as2);
 		unlink(as3);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 5;
 	}
 	if (open(as3, O_RDONLY) != RECLIMCODE) {
@@ -422,12 +490,16 @@ static int test_8() {
 		unlink(as1);
 		unlink(as2);
 		unlink(as3);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 5;
 	}
 
 	unlink(as1);
 	unlink(as2);
 	unlink(as3);
+	unlink(rd1 "/" d2 "/" d3);
+	unlink(rd1 "/" d2);
 	fprintf(2, "[TEST\t%s]: Test success.\n", testname);
 	return 0;
 
@@ -442,32 +514,42 @@ static int test_9() {
 #define d2 "t9d"
 #define d3 "t9dd"
 	
-	const char* afp = "/" rd2 "/" d2 "/" d3 "/f91";
-	const char* as1 = "/" rd2 "/" d2 "/l91";
+	const char* afp = "/" rd1 "/" d2 "/" d3 "/f91";
+	const char* as1 = "/" rd1 "/" d2 "/l91";
 	const char* data = "FiShBXj3ki";
 	const char* testname = "9";
 
-    int prep = mkdir(rd2 "/" d2) |
-			   mkdir(rd2 "/" d2 "/" d3);
+    int prep = mkdir(rd1 "/" d2) |
+			   mkdir(rd1 "/" d2 "/" d3);
     if (prep != 0) {
         fprintf(2, "[TEST\t%s]: Failed to create directories.\n", testname);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
         return 1;
     } 
 	if (create_file(afp, data, testname) != 0) {
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 2;
 	}
 	if (create_link(afp, as1, testname) != 0) {
 		unlink(afp);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 3;
 	}
 	unlink(afp);
 	if (open(as1, O_RDONLY) != NOSUCHFILECODE) {
 		fprintf(2, "[TEST\t%d]: Unexisting file link open() didn't return NOSUCHFILECODE.\n", testname);
 		unlink(as1);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 5;
 	}
 	
 	unlink(as1);
+	unlink(rd1 "/" d2 "/" d3);
+	unlink(rd1 "/" d2);
 	fprintf(2, "[TEST\t%s]: Test success.\n", testname);
 	return 0;
 
@@ -484,39 +566,51 @@ static int test_10() {
 #define d2 "t10d"
 #define d3 "t10dd"
 	
-	const char* afp1 = "/" rd2 "/" d2 "/" d3 "/f101";
+	const char* afp1 = "/" rd1 "/" d2 "/" d3 "/f101";
 	const char* fp1 = d2 "/" d3 "/f101";
-	const char* afp2 = "/" rd2 "/f101";
-	const char* as1 = "/" rd2 "/l101";
+	const char* afp2 = "/" rd1 "/f101";
+	const char* as1 = "/" rd1 "/l101";
 	const char* data = "FiShBXj3ki";
 	const char* testname = "10";
 
-    int prep = mkdir(rd2 "/" d2) |
-			   mkdir(rd2 "/" d2 "/" d3);
+    int prep = mkdir(rd1 "/" d2) |
+			   mkdir(rd1 "/" d2 "/" d3);
     if (prep != 0) {
         fprintf(2, "[TEST\t%s]: Failed to create directories.\n", testname);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
         return 1;
     } 
 	if (create_file(afp1, data, testname) != 0) {
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 2;
 	}
 	if (create_file(afp2, data, testname) != 0) {
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 2;
 	}
 	if (create_link(fp1, as1, testname) != 0) {
 		unlink(afp1);
 		unlink(afp2);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 3;
 	}
 	unlink(afp1);
 	if (open(as1, O_RDONLY) != NOSUCHFILECODE) {
 		fprintf(2, "[TEST\t%d]: Unexisting file link open() didn't return NOSUCHFILECODE.\n", testname);
 		unlink(as1);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 5;
 	}
 	
 	unlink(as1);
 	unlink(afp2);
+	unlink(rd1 "/" d2 "/" d3);
+	unlink(rd1 "/" d2);
 	fprintf(2, "[TEST\t%s]: Test success.\n", testname);
 	return 0;
 
@@ -532,39 +626,51 @@ static int test_11() {
 #define d2 "t11d"
 #define d3 "t11dd"
 	
-	const char* afp1 = "/" rd2 "/" d2 "/" d3 "/f111";
-	const char* afp2 = "/" rd2 "/f111";
+	const char* afp1 = "/" rd1 "/" d2 "/" d3 "/f111";
+	const char* afp2 = "/" rd1 "/f111";
 	const char* fp2 = "f111";
-	const char* as1 = "/" rd2 "/l111";
+	const char* as1 = "/" rd1 "/l111";
 	const char* data = "FiShBXj3ki";
 	const char* testname = "11";
 
-    int prep = mkdir(rd2 "/" d2) |
-			   mkdir(rd2 "/" d2 "/" d3);
+    int prep = mkdir(rd1 "/" d2) |
+			   mkdir(rd1 "/" d2 "/" d3);
     if (prep != 0) {
         fprintf(2, "[TEST\t%s]: Failed to create directories.\n", testname);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
         return 1;
     } 
 	if (create_file(afp1, data, testname) != 0) {
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 2;
 	}
 	if (create_file(afp2, data, testname) != 0) {
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 2;
 	}
 	if (create_link(fp2, as1, testname) != 0) {
 		unlink(afp1);
 		unlink(afp2);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 3;
 	}
 	unlink(afp2);
 	if (open(as1, O_RDONLY) != NOSUCHFILECODE) {
 		fprintf(2, "[TEST\t%d]: Unexisting file link open() didn't return NOSUCHFILECODE.\n", testname);
 		unlink(as1);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 5;
 	}
 	
 	unlink(as1);
 	unlink(afp1);
+	unlink(rd1 "/" d2 "/" d3);
+	unlink(rd1 "/" d2);
 	fprintf(2, "[TEST\t%s]: Test success.\n", testname);
 	return 0;
 
@@ -580,39 +686,51 @@ static int test_12() {
 #define d2 "t12d"
 #define d3 "t12dd"
 	
-	const char* afp1 = "/" rd2 "/" d2 "/" d3 "/f121";
-	const char* afp2 = "/" rd2 "/f121";
+	const char* afp1 = "/" rd1 "/" d2 "/" d3 "/f121";
+	const char* afp2 = "/" rd1 "/f121";
 	const char* fp2 = "../../f121";
-	const char* as1 = "/" rd2 "/" d2 "/" d3 "/l121";
+	const char* as1 = "/" rd1 "/" d2 "/" d3 "/l121";
 	const char* data = "FiShBXj3ki";
 	const char* testname = "12";
 
-    int prep = mkdir(rd2 "/" d2) |
-			   mkdir(rd2 "/" d2 "/" d3);
+    int prep = mkdir(rd1 "/" d2) |
+			   mkdir(rd1 "/" d2 "/" d3);
     if (prep != 0) {
         fprintf(2, "[TEST\t%s]: Failed to create directories.\n", testname);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
         return 1;
     } 
 	if (create_file(afp1, data, testname) != 0) {
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 2;
 	}
 	if (create_file(afp2, data, testname) != 0) {
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 2;
 	}
 	if (create_link(fp2, as1, testname) != 0) {
 		unlink(afp1);
 		unlink(afp2);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 3;
 	}
 	unlink(afp2);
 	if (open(as1, O_RDONLY) != NOSUCHFILECODE) {
 		fprintf(2, "[TEST\t%d]: Unexisting file link open() didn't return NOSUCHFILECODE.\n", testname);
 		unlink(as1);
+		unlink(rd1 "/" d2 "/" d3);
+		unlink(rd1 "/" d2);
 		return 5;
 	}
 	
 	unlink(as1);
 	unlink(afp1);
+	unlink(rd1 "/" d2 "/" d3);
+	unlink(rd1 "/" d2);
 	fprintf(2, "[TEST\t%s]: Test success.\n", testname);
 	return 0;
 
@@ -626,14 +744,10 @@ static void d1prep() {
         fprintf(2, "Failed to create directory \"%s\" for testing.\n", rd1);
         exit(1);
     }
-	if (mkdir(rd2)) {
-        fprintf(2, "Failed to create directory \"%s\" for testing.\n", rd2);
-        exit(1);
-    }
-	if (mkdir(rd3)) {
-        fprintf(2, "Failed to create directory \"%s\" for testing.\n", rd3);
-        exit(1);
-    }
+}
+
+static void d1end() {
+	unlink(rd1);
 }
 
 int main() {
@@ -652,6 +766,7 @@ int main() {
 	ret |= test_10();
 	ret |= test_11();
 	ret |= test_12();
+	d1end();
 
 	if (ret == 0) {
 		printf("All tests successed.\n");
