@@ -3,6 +3,8 @@
 #include "kernel/riscv.h"
 #include "user/user.h"
 
+#define PAGES 4
+
 int assert_accessed(const char* buf, int pages, const char* expected, int assert_num) {
     for (int i = 0; i < pages; ++i) {
         if (buf[i] != expected[i]) {
@@ -21,16 +23,13 @@ int safepgaccess(void* paddr, int pages, char* buf) {
     return 0;
 }
 
+char xarray[PGSIZE * PAGES];
 
 int test_array_stack() {
-
-#define PAGES 4
-
     int ret = 0;
     char accessed[PAGES];
-    char array[PGSIZE * PAGES];
 
-    if (!safepgaccess(array, PAGES, accessed)) {
+    if (safepgaccess(xarray, PAGES, accessed)) {
         ret = 10;
         goto test_array_stack_end;
     }
@@ -39,9 +38,9 @@ int test_array_stack() {
     }
 
     for (int i = 0; i < PGSIZE * PAGES; ++i)
-        array[i] = 0;
+        xarray[i] = 0;
     
-    if (!safepgaccess(array, PAGES, accessed)) {
+    if (safepgaccess(xarray, PAGES, accessed)) {
         ret = 10;
         goto test_array_stack_end;
     }
@@ -49,10 +48,10 @@ int test_array_stack() {
         ret = 1;
     }
 
-    array[PGSIZE * 0] += 1;
-    array[PGSIZE * 3] += 1;
+    xarray[PGSIZE * 0] += 1;
+    xarray[PGSIZE * 3] += 1;
 
-    if (!safepgaccess(array, PAGES, accessed)) {
+    if (safepgaccess(xarray, PAGES, accessed)) {
         ret = 10;
         goto test_array_stack_end;
     }
@@ -60,11 +59,11 @@ int test_array_stack() {
         ret = 1;
     }
 
-    array[PGSIZE * 1] += 1;
-    array[PGSIZE * 2] += 1;
-    array[PGSIZE * 3] += 1;
+    xarray[PGSIZE * 1] += 1;
+    xarray[PGSIZE * 2] += 1;
+    xarray[PGSIZE * 3] += 1;
 
-    if (!safepgaccess(array, PAGES, accessed)) {
+    if (safepgaccess(xarray, PAGES, accessed)) {
         ret = 10;
         goto test_array_stack_end;
     }
@@ -74,13 +73,9 @@ int test_array_stack() {
 
 test_array_stack_end:
     return ret;
-    return 0;
 }
 
 int test_array_heap() {
-
-#define PAGES 4
-
     int ret = 0;
     char accessed[PAGES];
     char* array = malloc(PGSIZE * PAGES * sizeof(char));
@@ -134,7 +129,7 @@ test_array_heap_end:
 
 int main() {
     int ret = 0;
-    // ret |= test_array_stack();
+    ret |= test_array_stack();
     ret |= test_array_heap();
 
     if (!ret) {
