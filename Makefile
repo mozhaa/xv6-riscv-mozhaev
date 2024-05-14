@@ -59,6 +59,8 @@ OBJDUMP = $(TOOLPREFIX)objdump
 
 CFLAGS = -Wall -Werror -O -fno-omit-frame-pointer -ggdb -gdwarf-2
 CFLAGS += -MD
+CFLAGS += -Wno-unused-variable
+CFLAGS += -Wno-unused-function
 CFLAGS += -mcmodel=medany
 CFLAGS += -ffreestanding -fno-common -nostdlib -mno-relax
 CFLAGS += -I.
@@ -134,6 +136,7 @@ UPROGS=\
 	$U/_wc\
 	$U/_zombie\
 	$U/_dmesg\
+	$U/_pgtest\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
