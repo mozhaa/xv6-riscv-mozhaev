@@ -185,6 +185,9 @@ void            virtio_disk_init(void);
 void            virtio_disk_rw(struct buf *, int);
 void            virtio_disk_intr(void);
 
+// symlink.c
+int             read_symlink(char* filename, char* buf);
+
 // diag.c
 void            pr_msg(const char* fmt, ...);
 void            init_dmesg(void);

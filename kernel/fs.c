@@ -210,6 +210,7 @@ ialloc(uint dev, short type)
       dip->type = type;
       log_write(bp);   // mark it allocated on the disk
       brelse(bp);
+      pr_msg("ialloc: inum=%d, type=%d", inum, type);
       return iget(dev, inum);
     }
     brelse(bp);
@@ -235,6 +236,7 @@ iupdate(struct inode *ip)
   dip->minor = ip->minor;
   dip->nlink = ip->nlink;
   dip->size = ip->size;
+  pr_msg("iupdate: inode=%d, from %d to %d", ip->inum, ip->type, dip->type);
   memmove(dip->addrs, ip->addrs, sizeof(ip->addrs));
   log_write(bp);
   brelse(bp);
