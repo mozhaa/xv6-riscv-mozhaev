@@ -8,7 +8,14 @@
 int assert_accessed(const char* buf, int pages, const char* expected, int assert_num) {
     for (int i = 0; i < pages; ++i) {
         if (buf[i] != expected[i]) {
-            fprintf(2, "ASSERT #%d FAILURE: pgaccess returned %d on index #%d, expected: %d\n", assert_num, buf[i], i, expected[i]);
+            fprintf(2, "ASSERT #%d FAILURE:\n", assert_num);
+            fprintf(2, "\tACTUAL:\t\t");
+            for (int j = 0; j < pages; ++j)
+                fprintf(2, "%d", buf[j]);
+            fprintf(2, "\n\tEXPECTED:\t");
+            for (int j = 0; j < pages; ++j)
+                fprintf(2, "%d", expected[j]);
+            fprintf(2, "\n");
             return 0;
         }
     }
@@ -23,107 +30,87 @@ int safepgaccess(void* paddr, int pages, char* buf) {
     return 0;
 }
 
-char xarray[PGSIZE * PAGES];
+int common_test(char* array) {
 
-int test_array_stack() {
+#define __assert(assert_num, expected) \
+    do { \
+        if (safepgaccess(array, PAGES, accessed)) \
+            return 2; \
+        if (!assert_accessed(accessed, PAGES, expected, assert_num)) \
+            ret = 1; \
+    } while(0)
+
     int ret = 0;
     char accessed[PAGES];
 
-    if (safepgaccess(xarray, PAGES, accessed)) {
-        ret = 10;
-        goto test_array_stack_end;
-    }
-    if (!assert_accessed(accessed, PAGES, "\0\0\0\0", 1)) {
-        ret = 1;
-    }
+    // unitialized array
+    __assert(1, "\0\0\0\0");
 
-    for (int i = 0; i < PGSIZE * PAGES; ++i)
-        xarray[i] = 0;
-    
-    if (safepgaccess(xarray, PAGES, accessed)) {
-        ret = 10;
-        goto test_array_stack_end;
-    }
-    if (!assert_accessed(accessed, PAGES, "\1\1\1\1", 2)) {
-        ret = 1;
-    }
-
-    xarray[PGSIZE * 0] += 1;
-    xarray[PGSIZE * 3] += 1;
-
-    if (safepgaccess(xarray, PAGES, accessed)) {
-        ret = 10;
-        goto test_array_stack_end;
-    }
-    if (!assert_accessed(accessed, PAGES, "\1\0\0\1", 3)) {
-        ret = 1;
-    }
-
-    xarray[PGSIZE * 1] += 1;
-    xarray[PGSIZE * 2] += 1;
-    xarray[PGSIZE * 3] += 1;
-
-    if (safepgaccess(xarray, PAGES, accessed)) {
-        ret = 10;
-        goto test_array_stack_end;
-    }
-    if (!assert_accessed(accessed, PAGES, "\0\1\1\1", 4)) {
-        ret = 1;
-    }
-
-test_array_stack_end:
-    return ret;
-}
-
-int test_array_heap() {
-    int ret = 0;
-    char accessed[PAGES];
-    char* array = malloc(PGSIZE * PAGES * sizeof(char));
-
-    if (safepgaccess(array, PAGES, accessed)) {
-        ret = 10;
-        goto test_array_heap_end;
-    }
-    if (!assert_accessed(accessed, PAGES, "\0\0\0\0", 1)) {
-        ret = 1;
-    }
-
+    // fill with zeros
     for (int i = 0; i < PGSIZE * PAGES; ++i)
         array[i] = 0;
-    
-    if (safepgaccess(array, PAGES, accessed)) {
-        ret = 10;
-        goto test_array_heap_end;
-    }
-    if (!assert_accessed(accessed, PAGES, "\1\1\1\1", 2)) {
-        ret = 1;
-    }
+    __assert(2, "\1\1\1\1");
 
+    // modify values in pages #0 and #3
     array[PGSIZE * 0] += 1;
     array[PGSIZE * 3] += 1;
+    __assert(3, "\1\0\0\1");
 
-    if (safepgaccess(array, PAGES, accessed)) {
-        ret = 10;
-        goto test_array_heap_end;
-    }
-    if (!assert_accessed(accessed, PAGES, "\1\0\0\1", 3)) {
-        ret = 1;
-    }
-
+    // modify values in pages #1, #2 and #3
     array[PGSIZE * 1] += 1;
     array[PGSIZE * 2] += 1;
     array[PGSIZE * 3] += 1;
+    __assert(4, "\0\1\1\1");
+    
+    // modify values in page #0
+    array[0] += 1;
+    __assert(5, "\1\0\0\0");
 
-    if (safepgaccess(array, PAGES, accessed)) {
-        ret = 10;
-        goto test_array_heap_end;
-    }
-    if (!assert_accessed(accessed, PAGES, "\0\1\1\1", 4)) {
-        ret = 1;
-    }
+    // do nothing
+    __assert(6, "\0\0\0\0");
 
-test_array_heap_end:
-    free(array);
+    // modify values in page #0
+    array[0] += 1;
+    __assert(7, "\1\0\0\0");
+
+    // modify values in pages #2 and #3
+    array[PGSIZE * 1] += 1;
+    array[PGSIZE * 2] += 1;
+    __assert(8, "\0\1\1\0");
+
+    // do nothing
+    __assert(9, "\0\0\0\0");
+
+    // do nothing again
+    __assert(10, "\0\0\0\0");
+
+    // fill page #3
+    for (int i = PGSIZE * 3; i < PGSIZE * 4; ++i)
+        array[i] = 66;
+    __assert(11, "\0\0\0\1");
+
+    return ret;
+
+#undef __assert
+
+}
+
+char xarray[PGSIZE * PAGES];
+
+/* Test pgaccess() for array allocated on stack */
+int test_array_stack() {
+    return common_test(xarray);
+}
+
+/* Test pgaccess() for array allocated on heap */
+int test_array_heap() {
+    char* xarray = malloc(PGSIZE * PAGES * sizeof(char));
+    if (xarray == 0) {
+        fprintf(2, "malloc() failure\n");
+        return 4;
+    }
+    int ret = common_test(xarray);
+    free(xarray);
     return ret;
 }
 
