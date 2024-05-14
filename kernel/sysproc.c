@@ -89,3 +89,34 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64 sys_pgaccess(void) {
+  uint64 paddr, dest;
+  int pages;
+
+  argaddr(0, &paddr);
+  argint(1, &pages);
+  argaddr(2, &dest);
+
+  pagetable_t pagetable = myproc()->pagetable;
+
+  char accessed[pages];
+  for (int i = 0; i < pages; ++i) {
+    pte_t *pte = walk(pagetable, paddr + PGSIZE * i, 0);
+    if (*pte & PTE_A) {
+      accessed[i] = 1;
+      
+      // clear PTE_A bits after checking
+      *pte &= ~PTE_A;
+    } else {
+      accessed[i] = 0;
+    }
+  }
+
+  if (copyout(pagetable, dest, accessed, sizeof(accessed)) < 0) {
+    // copyout failure
+    return 1;
+  }
+  
+  return 0;
+}
