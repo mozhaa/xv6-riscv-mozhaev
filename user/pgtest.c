@@ -41,7 +41,7 @@ int common_test(char* array) {
     } while(0)
 
     int ret = 0;
-    char accessed[PAGES];
+    char accessed[PAGES + 1];
 
     // unitialized array
     __assert(1, "\0\0\0\0");

@@ -100,9 +100,12 @@ uint64 sys_pgaccess(void) {
 
   pagetable_t pagetable = myproc()->pagetable;
 
+  uint64 end_addr = paddr + pages * PGSIZE + 1;
+  uint64 addr = paddr - paddr % PGSIZE;
+
   char accessed[pages];
-  for (int i = 0; i < pages; ++i) {
-    pte_t *pte = walk(pagetable, paddr + PGSIZE * i, 0);
+  for (int i = 0; addr < end_addr; addr += PGSIZE, ++i) {
+    pte_t *pte = walk(pagetable, addr, 0);
     if (*pte & PTE_A) {
       accessed[i] = 1;
       
