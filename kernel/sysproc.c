@@ -90,6 +90,12 @@ sys_uptime(void)
   return xticks;
 }
 
+
+// writes bytes 0 or 1 into dest array:
+//   0 - page hadn't been accessed since last pgaccess() call
+//   1 - page had been accessed
+// dest size should be [pages + 1], since memory block of size 
+// (pages * PGSIZE) bytes possibly can intersect pages boundaries
 uint64 sys_pgaccess(void) {
   uint64 paddr, dest;
   int pages;
